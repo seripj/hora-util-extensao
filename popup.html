@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR" id="html-root">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HoraÚtil</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div class="app">
+
+    <!-- HEADER -->
+    <header class="header">
+      <div class="header-left">
+        <span class="logo-icon">⏱</span>
+        <span class="logo-text">HoraÚtil</span>
+      </div>
+      <select id="lang-select" class="lang-select">
+        <option value="pt">🇧🇷 Português</option>
+        <option value="en">🇺🇸 English</option>
+      </select>
+    </header>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab active" data-tab="mes"     data-i18n="tab_mes">Por Mês</button>
+      <button class="tab"        data-tab="periodo" data-i18n="tab_periodo">Por Período</button>
+    </div>
+
+    <!-- FORM: POR MÊS -->
+    <div class="panel" id="panel-mes">
+      <div class="field">
+        <label class="label" data-i18n="label_mes">Mês / Ano</label>
+        <!-- Trigger customizado -->
+        <button type="button" id="btn-mes" class="dp-trigger">
+          <span id="btn-mes-text">—</span>
+          <span class="dp-caret">▾</span>
+        </button>
+        <!-- Hidden input mantém o valor YYYY-MM -->
+        <input type="hidden" id="input-mes" />
+      </div>
+    </div>
+
+    <!-- FORM: POR PERÍODO -->
+    <div class="panel hidden" id="panel-periodo">
+      <div class="field-row">
+        <div class="field">
+          <label class="label" data-i18n="label_inicio">Data Início</label>
+          <button type="button" id="btn-inicio" class="dp-trigger">
+            <span id="btn-inicio-text">—</span>
+            <span class="dp-caret">▾</span>
+          </button>
+          <input type="hidden" id="input-inicio" />
+        </div>
+        <div class="field">
+          <label class="label" data-i18n="label_fim">Data Fim</label>
+          <button type="button" id="btn-fim" class="dp-trigger">
+            <span id="btn-fim-text">—</span>
+            <span class="dp-caret">▾</span>
+          </button>
+          <input type="hidden" id="input-fim" />
+        </div>
+      </div>
+    </div>
+
+    <!-- CALENDÁRIO FLUTUANTE (injetado pelo JS) -->
+    <div id="dp-popup" class="dp-popup hidden"></div>
+
+    <!-- CONFIGURAÇÕES -->
+    <div class="config-section">
+      <div class="config-row">
+        <div class="field mini">
+          <label class="label" data-i18n="label_folgas">🏖️ Folgas + Feriados</label>
+          <div class="input-stepper">
+            <button class="step-btn" data-target="folgas" data-op="-">−</button>
+            <input type="number" id="folgas" class="input center" value="0" min="0" max="31" />
+            <button class="step-btn" data-target="folgas" data-op="+">+</button>
+          </div>
+        </div>
+        <div class="field mini">
+          <label class="label" data-i18n="label_horas">⏰ Horas/Dia</label>
+          <div class="input-stepper">
+            <button class="step-btn" data-target="horas-dia" data-op="-">−</button>
+            <input type="number" id="horas-dia" class="input center" value="8" min="1" max="24" />
+            <button class="step-btn" data-target="horas-dia" data-op="+">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="desconto-info" id="desconto-info"></div>
+    </div>
+
+    <!-- DIVIDER -->
+    <div class="divider">
+      <span data-i18n="divider_resultados">resultados</span>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="results">
+      <div class="result-card accent">
+        <div class="result-label" data-i18n="res_uteis_label">Dias Úteis no Período</div>
+        <div class="result-value" id="res-uteis">—</div>
+        <div class="result-sub"  id="res-uteis-sub"></div>
+      </div>
+      <div class="result-row">
+        <div class="result-card half">
+          <div class="result-label" data-i18n="res_corridos_label">Dias Corridos</div>
+          <div class="result-value sm" id="res-corridos">—</div>
+          <div class="result-sub"     id="res-corridos-sub"></div>
+        </div>
+        <div class="result-card half">
+          <div class="result-label" data-i18n="res_uteis_hoje_label">Úteis até Hoje</div>
+          <div class="result-value sm" id="res-uteis-hoje">—</div>
+          <div class="result-sub" data-i18n="res_uteis_hoje_sub">dias trabalhados</div>
+        </div>
+      </div>
+      <div class="result-row">
+        <div class="result-card half highlight">
+          <div class="result-label" data-i18n="res_horas_total_label">Horas a Baixar</div>
+          <div class="result-value sm" id="res-horas-total">—</div>
+          <div class="result-sub" data-i18n="res_horas_total_sub">total do período</div>
+        </div>
+        <div class="result-card half highlight">
+          <div class="result-label" data-i18n="res_horas_hoje_label">Horas até Hoje</div>
+          <div class="result-value sm" id="res-horas-hoje">—</div>
+          <div class="result-sub"     id="res-horas-hoje-sub"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <span data-i18n="footer_data">Data atual:</span> <span id="data-hoje" class="mono">—</span>
+    </footer>
+
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
